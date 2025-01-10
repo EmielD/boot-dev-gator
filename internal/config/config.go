@@ -38,7 +38,7 @@ func (c *Config) SetUser(name string) (Config, error) {
 		return Config{}, fmt.Errorf("could not get users home directory: %v", err)
 	}
 
-	data, err := json.Marshal(c)
+	data, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		return Config{}, fmt.Errorf("could not encode user: %v", err)
 	}
@@ -48,7 +48,5 @@ func (c *Config) SetUser(name string) (Config, error) {
 		return Config{}, fmt.Errorf("error reading file: %v", err)
 	}
 
-	config := c
-	return *config, nil
-
+	return *c, nil
 }
