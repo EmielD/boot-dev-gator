@@ -39,6 +39,8 @@ func main() {
 	commands.register("register", handlerRegister)
 	commands.register("reset", handlerReset)
 	commands.register("users", handlerUsers)
+	commands.register("agg", handlerAgg)
+	commands.register("addfeed", handlerAddFeed)
 
 	err = commands.run(&stateVar, commandVar)
 	if err != nil {
