@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
 	"github.com/emield/gator/internal/config"
+	"github.com/emield/gator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -21,11 +24,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	stateVar := state{config: &config}
+	db, err := sql.Open("postgres", config.Db_url)
+	if err != nil {
+		fmt.Printf("Error connectiong to database: %v", err)
+		os.Exit(1)
+	}
+
+	dbQueries := database.New(db)
+	stateVar := state{db: dbQueries, config: &config}
 	commandVar := command{name: commandName, arguments: os.Args[2:]}
 
 	commands := commands{make(map[string]func(*state, command) error)}
 	commands.register("login", handlerLogin)
+	commands.register("register", handlerRegister)
+	commands.register("reset", handlerReset)
+	commands.register("users", handlerUsers)
 
 	err = commands.run(&stateVar, commandVar)
 	if err != nil {
