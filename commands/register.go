@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/emield/gator/internal/database"
+	"github.com/emield/gator/internal/types"
 	"github.com/google/uuid"
 )
 
-func HandlerRegister(s *State, cmd Command) error {
+func HandlerRegister(s *types.State, cmd types.Command) error {
 	if len(cmd.Arguments) == 0 {
 		return errors.New(("username expected for register command"))
 	}

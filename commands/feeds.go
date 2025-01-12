@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/emield/gator/internal/database"
+	"github.com/emield/gator/internal/types"
 )
 
-func HandlerFeeds(s *State, cmd Command) error {
+func HandlerFeeds(s *types.State, cmd types.Command) error {
 
 	feeds, err := s.Db.GetFeeds(context.Background())
 	if err != nil {

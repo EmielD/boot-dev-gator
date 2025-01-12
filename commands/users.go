@@ -3,9 +3,11 @@ package commands
 import (
 	"context"
 	"fmt"
+
+	"github.com/emield/gator/internal/types"
 )
 
-func HandlerUsers(s *State, cmd Command) error {
+func HandlerUsers(s *types.State, cmd types.Command) error {
 	users, err := s.Db.GetUsers(context.Background())
 	if err != nil {
 		return err

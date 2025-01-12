@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/emield/gator/commands"
+	c "github.com/emield/gator/commands"
 	"github.com/emield/gator/internal/config"
 	"github.com/emield/gator/internal/database"
+	m "github.com/emield/gator/internal/middleware"
+	"github.com/emield/gator/internal/types"
 	_ "github.com/lib/pq"
 )
 
@@ -32,17 +34,19 @@ func main() {
 	}
 
 	dbQueries := database.New(db)
-	stateVar := commands.State{Db: dbQueries, Config: &config}
-	commandVar := commands.Command{Name: commandName, Arguments: os.Args[2:]}
+	stateVar := types.State{Db: dbQueries, Config: &config}
+	commandVar := types.Command{Name: commandName, Arguments: os.Args[2:]}
 
-	cmd := commands.Commands{CommandMap: make(map[string]func(*commands.State, commands.Command) error)}
-	cmd.Register("login", commands.HandlerLogin)
-	cmd.Register("register", commands.HandlerRegister)
-	cmd.Register("reset", commands.HandlerReset)
-	cmd.Register("users", commands.HandlerUsers)
-	cmd.Register("agg", commands.HandlerAgg)
-	cmd.Register("addfeed", commands.HandlerAddFeed)
-	cmd.Register("feeds", commands.HandlerFeeds)
+	cmd := c.Commands{CommandMap: make(map[string]func(*types.State, types.Command) error)}
+	cmd.Register("login", c.HandlerLogin)
+	cmd.Register("register", c.HandlerRegister)
+	cmd.Register("reset", c.HandlerReset)
+	cmd.Register("users", c.HandlerUsers)
+	cmd.Register("agg", c.HandlerAgg)
+	cmd.Register("addfeed", m.LoggedIn(c.HandlerAddFeed))
+	cmd.Register("feeds", c.HandlerFeeds)
+	cmd.Register("follow", m.LoggedIn(c.HandlerFollow))
+	cmd.Register("following", m.LoggedIn(c.HandlerFollowing))
 
 	err = cmd.Run(&stateVar, commandVar)
 	if err != nil {

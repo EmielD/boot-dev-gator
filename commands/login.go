@@ -1,22 +1,18 @@
 package commands
 
 import (
-	"context"
 	"errors"
 	"fmt"
+
+	"github.com/emield/gator/internal/types"
 )
 
-func HandlerLogin(s *State, cmd Command) error {
+func HandlerLogin(s *types.State, cmd types.Command) error {
 	if len(cmd.Arguments) == 0 {
 		return errors.New("username expected for login command")
 	}
 
-	user, err := s.Db.GetUser(context.Background(), cmd.Arguments[0])
-	if err != nil {
-		return err
-	}
-
-	_, err = s.Config.SetUser(user.Name)
+	_, err := s.Config.SetUser(cmd.Arguments[0])
 	if err != nil {
 		return err
 	}

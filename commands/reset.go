@@ -1,8 +1,12 @@
 package commands
 
-import "context"
+import (
+	"context"
 
-func HandlerReset(s *State, cmd Command) error {
+	"github.com/emield/gator/internal/types"
+)
+
+func HandlerReset(s *types.State, cmd types.Command) error {
 	s.Db.Reset(context.Background())
 	return nil
 }

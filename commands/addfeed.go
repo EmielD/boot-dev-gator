@@ -6,17 +6,13 @@ import (
 	"time"
 
 	"github.com/emield/gator/internal/database"
+	"github.com/emield/gator/internal/types"
 	"github.com/google/uuid"
 )
 
-func HandlerAddFeed(s *State, cmd Command) error {
+func HandlerAddFeed(s *types.State, cmd types.Command, user database.User) error {
 	if len(cmd.Arguments) != 2 {
 		return fmt.Errorf("usage: gator addfeed *name* *url*")
-	}
-
-	user, err := s.Db.GetUser(context.Background(), s.Config.Current_user_name)
-	if err != nil {
-		return err
 	}
 
 	feedName := cmd.Arguments[0]
@@ -30,7 +26,17 @@ func HandlerAddFeed(s *State, cmd Command) error {
 		Url:       feedUrl,
 		UserID:    user.ID,
 	})
+	if err != nil {
+		return err
+	}
 
+	_, err = s.Db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		FeedID:    result.ID,
+		UserID:    user.ID,
+	})
 	if err != nil {
 		return err
 	}

@@ -7,9 +7,11 @@ import (
 	"html"
 	"io"
 	"net/http"
+
+	"github.com/emield/gator/internal/types"
 )
 
-func HandlerAgg(s *State, cmd Command) error {
+func HandlerAgg(s *types.State, cmd types.Command) error {
 
 	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
 	if err != nil {

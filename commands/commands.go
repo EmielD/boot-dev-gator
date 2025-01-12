@@ -3,29 +3,18 @@ package commands
 import (
 	"errors"
 
-	"github.com/emield/gator/internal/config"
-	"github.com/emield/gator/internal/database"
+	"github.com/emield/gator/internal/types"
 )
 
-type State struct {
-	Db     *database.Queries
-	Config *config.Config
-}
-
-type Command struct {
-	Name      string
-	Arguments []string
-}
-
 type Commands struct {
-	CommandMap map[string]func(*State, Command) error
+	CommandMap map[string]func(*types.State, types.Command) error
 }
 
-func (c *Commands) Register(name string, f func(*State, Command) error) {
+func (c *Commands) Register(name string, f func(*types.State, types.Command) error) {
 	c.CommandMap[name] = f
 }
 
-func (c *Commands) Run(s *State, cmd Command) error {
+func (c *Commands) Run(s *types.State, cmd types.Command) error {
 	if s == nil {
 		return errors.New("could not run command, state is nil")
 	}
