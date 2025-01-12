@@ -47,6 +47,7 @@ func main() {
 	cmd.Register("feeds", c.HandlerFeeds)
 	cmd.Register("follow", m.LoggedIn(c.HandlerFollow))
 	cmd.Register("following", m.LoggedIn(c.HandlerFollowing))
+	cmd.Register("unfollow", m.LoggedIn(c.HandleUnfollow))
 
 	err = cmd.Run(&stateVar, commandVar)
 	if err != nil {
