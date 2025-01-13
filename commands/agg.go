@@ -7,18 +7,47 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/emield/gator/internal/types"
 )
 
 func HandlerAgg(s *types.State, cmd types.Command) error {
+	if len(cmd.Arguments) == 0 {
+		return fmt.Errorf("agg usage: agg <time between fetches> - example: agg 1m")
+	}
 
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	duration, err := time.ParseDuration(cmd.Arguments[0])
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(feed)
+	fmt.Printf("Collecting feeds every %v\n", duration.String())
+	ticker := time.NewTicker(duration)
+	for ; ; <-ticker.C {
+		fmt.Println("Timer ran out, beginning to scrape feeds..")
+		scrapeFeeds(s)
+	}
+}
+
+func scrapeFeeds(s *types.State) error {
+	feed, err := s.Db.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		return err
+	}
+
+	rssFeed, err := fetchFeed(context.Background(), feed.Url)
+	if err != nil {
+		return err
+	}
+
+	s.Db.MarkFeedFetched(context.Background(), feed.ID)
+
+	for _, item := range rssFeed.Channel.Item {
+		fmt.Println("------------------------------------")
+		fmt.Println(item)
+		fmt.Println("------------------------------------")
+	}
 
 	return nil
 }

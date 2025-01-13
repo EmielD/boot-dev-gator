@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -12,7 +13,12 @@ func HandlerLogin(s *types.State, cmd types.Command) error {
 		return errors.New("username expected for login command")
 	}
 
-	_, err := s.Config.SetUser(cmd.Arguments[0])
+	user, err := s.Db.GetUser(context.Background(), cmd.Arguments[0])
+	if err != nil {
+		return fmt.Errorf("user does not exist, register the user first using: register <name>")
+	}
+
+	_, err = s.Config.SetUser(user.Name)
 	if err != nil {
 		return err
 	}
