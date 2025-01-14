@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"database/sql"
 	"encoding/xml"
 	"fmt"
 	"html"
@@ -9,7 +10,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/emield/gator/internal/database"
 	"github.com/emield/gator/internal/types"
+	"github.com/google/uuid"
 )
 
 func HandlerAgg(s *types.State, cmd types.Command) error {
@@ -44,9 +47,25 @@ func scrapeFeeds(s *types.State) error {
 	s.Db.MarkFeedFetched(context.Background(), feed.ID)
 
 	for _, item := range rssFeed.Channel.Item {
-		fmt.Println("------------------------------------")
-		fmt.Println(item)
-		fmt.Println("------------------------------------")
+
+		publishedAt := sql.NullTime{}
+		if t, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
+			publishedAt = sql.NullTime{
+				Time:  t,
+				Valid: true,
+			}
+		}
+
+		s.Db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			Title:       item.Title,
+			Url:         item.Link,
+			Description: sql.NullString{String: item.Description, Valid: true},
+			PublishedAt: publishedAt,
+			FeedID:      feed.ID,
+		})
 	}
 
 	return nil

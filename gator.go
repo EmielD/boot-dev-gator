@@ -48,6 +48,7 @@ func main() {
 	cmd.Register("follow", m.LoggedIn(c.HandlerFollow))
 	cmd.Register("following", m.LoggedIn(c.HandlerFollowing))
 	cmd.Register("unfollow", m.LoggedIn(c.HandleUnfollow))
+	cmd.Register("browse", m.LoggedIn(c.HandlerBrowse))
 
 	err = cmd.Run(&stateVar, commandVar)
 	if err != nil {
